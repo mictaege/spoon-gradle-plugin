@@ -1,0 +1,18 @@
+group 'com.github.mictaege'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile('fr.inria.gforge.spoon:spoon-core:5.6.0') {
+        exclude group: "org.eclipse.tycho", module : "org.eclipse.jdt.core"
+    }
+}
