@@ -2,12 +2,16 @@ package com.github.mictaege.spoon_gradle_plugin
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskAction
 import spoon.Launcher
 
 import static java.io.File.pathSeparator
 
 class SpoonTask extends DefaultTask {
+
+    private Logger log = Logging.getLogger("spoon")
 
     boolean buildOnlyOutdatedFiles
     String[] srcFolders = []
@@ -37,19 +41,19 @@ class SpoonTask extends DefaultTask {
             addParam(params, '--source-classpath', classpath.asPath)
         }
         addKey(params, '--noclasspath')
-
+        addParam(params, '--level', "OFF")
 
         def launcher = new Launcher()
         String[] args = params.toArray(new String[params.size()])
+        logEnv(args)
         launcher.setArgs(args)
-        printEnvironment(System.out.&println, args)
         launcher.run()
     }
 
-    private printEnvironment(printer, String[] args) {
-        printer "Spoon arguments:"
+    private logEnv(String[] args) {
+        log.debug "Spoon arguments:"
         for (final String arg : args) {
-            printer "\t$arg"
+            log.debug "\t$arg"
         }
     }
 
