@@ -42,6 +42,8 @@ class SpoonTask extends DefaultTask {
         }
         addKey(params, '--noclasspath')
         addParam(params, '--level', "OFF")
+        addKey(params, '--lines')
+        addKey(params, '--with-imports')
 
         def launcher = new Launcher()
         String[] args = params.toArray(new String[params.size()])
