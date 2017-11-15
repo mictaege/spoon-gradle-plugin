@@ -5,8 +5,6 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.compile.JavaCompile
 
-import java.nio.file.Files
-
 class SpoonPlugin implements Plugin<Project> {
 
     @Override
@@ -17,12 +15,11 @@ class SpoonPlugin implements Plugin<Project> {
         project.extensions.create "spoon", SpoonExtension
 
         project.afterEvaluate({
-
             project.tasks.withType(JavaCompile) {
                 def pathName = it.source.getAsPath()
                 def name = it.getDestinationDir().name
                 def compileClasspath = it.classpath
-                if (!it.source.empty) {
+                if (!project.spoon.exclude.contains(name) && !it.source.empty) {
                     def spoonTask = project.task("spoon${name}".toLowerCase(), type: SpoonTask) {
                         buildOnlyOutdatedFiles = project.spoon.buildOnlyOutdatedFiles
                         srcFolders += pathName

@@ -8,6 +8,9 @@ class SpoonExtension {
     /** List of processor's qualified name to be used. */
     String[] processors = []
 
+    /** List of excluded source sets. */
+    String[] exclude = []
+
     /** Java source code compliance level (1,2,3,4,5, 6, 7 or 8). (default: 8) */
     int compliance = 8
 

@@ -116,12 +116,14 @@ build
 Within the _spoon_ section you can also set the following flags 
 - _buildOnlyOutdatedFiles_: Set Spoon to build only the source files that have been modified since the latest source code generation, for performance purpose. (default: true) 
 - _compliance_: Java source code compliance level (1,2,3,4,5, 6, 7 or 8). (default: 8)
+- _exclude_: Exclude Java source sets from spoon processing. (default: none)
 
 ```Groovy
 spoon{
     processors = ['com.github.mictaege.spoon_processors.CheckNotNullProcessor']
     buildOnlyOutdatedFiles false
     compliance 7
+    exclude = ['main', 'test']
 }
 ```
 
