@@ -11,7 +11,7 @@ This repository contains a gradle plugin for the Java analysis and transformatio
 
 ## Prerequisites
 
-The _spoon-gradle-plugin_ requires the Gradle Java Plugin and assumes the default Source Sets structure for Java projects: 
+The _spoon-gradle-plugin_ requires the Gradle Java Plugin and is able to process all Java source sets: 
 
 ```Groovy
 sourceSets {
@@ -24,6 +24,18 @@ sourceSets {
         java {
             srcDir 'src/test/java '
         }        
+    }
+    beans {
+        java {
+            srcDir 'src/main/java'
+        }
+        //dependencies
+    }
+    beansTest {
+        java {
+            srcDir 'src/test/java '
+        }
+        //dependencies        
     }
 }
 ```
