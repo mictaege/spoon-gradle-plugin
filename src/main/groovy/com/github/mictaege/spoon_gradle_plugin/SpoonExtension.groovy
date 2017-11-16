@@ -8,6 +8,9 @@ class SpoonExtension {
     /** List of processor's qualified name to be used. */
     String[] processors = []
 
+    /** A provider of lazy evaluated extensions. */
+    LazySpoonExtensionProvider lazyExtensions = null
+
     /** List of excluded source sets. */
     String[] exclude = []
 
