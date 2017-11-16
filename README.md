@@ -11,7 +11,7 @@ This repository contains a gradle plugin for the Java analysis and transformatio
 
 ## Prerequisites
 
-The _spoon-gradle-plugin_ requires the Gradle Java Plugin and assumes the default Source Sets structure for Java projects: 
+The _spoon-gradle-plugin_ requires the Gradle Java Plugin and is able to process all Java source sets: 
 
 ```Groovy
 sourceSets {
@@ -24,6 +24,18 @@ sourceSets {
         java {
             srcDir 'src/test/java '
         }        
+    }
+    beans {
+        java {
+            srcDir 'src/main/java'
+        }
+        //dependencies
+    }
+    beansTest {
+        java {
+            srcDir 'src/test/java '
+        }
+        //dependencies        
     }
 }
 ```
@@ -104,12 +116,14 @@ build
 Within the _spoon_ section you can also set the following flags 
 - _buildOnlyOutdatedFiles_: Set Spoon to build only the source files that have been modified since the latest source code generation, for performance purpose. (default: true) 
 - _compliance_: Java source code compliance level (1,2,3,4,5, 6, 7 or 8). (default: 8)
+- _exclude_: Exclude Java source sets from spoon processing. (default: none)
 
 ```Groovy
 spoon{
     processors = ['com.github.mictaege.spoon_processors.CheckNotNullProcessor']
     buildOnlyOutdatedFiles false
     compliance 7
+    exclude = ['main', 'test']
 }
 ```
 
