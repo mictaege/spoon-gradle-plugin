@@ -2,8 +2,11 @@ package com.github.mictaege.spoon_gradle_plugin
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import spoon.Launcher
 
@@ -14,7 +17,9 @@ class SpoonTask extends DefaultTask {
     private Logger log = Logging.getLogger("spoon")
 
     boolean buildOnlyOutdatedFiles
-    String[] srcFolders = []
+    @InputFiles
+    FileTree srcFolder
+    @OutputDirectory
     File outFolder
     String[] processors = []
     FileCollection classpath
@@ -23,12 +28,9 @@ class SpoonTask extends DefaultTask {
     @TaskAction
     void run() {
 
-        if (srcFolders.size() == 0) {
-            return
-        }
         List<String> params = new LinkedList<>()
 
-        addParam(params, '--input', srcFolders.join(pathSeparator))
+        addParam(params, '--input', srcFolder.getAsPath())
         if (buildOnlyOutdatedFiles) {
             addKey(params, '--buildOnlyOutdatedFiles')
         }
