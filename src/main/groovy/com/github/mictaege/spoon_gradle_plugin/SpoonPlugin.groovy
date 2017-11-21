@@ -17,14 +17,14 @@ class SpoonPlugin implements Plugin<Project> {
         project.afterEvaluate({
 
             project.tasks.withType(JavaCompile) {
-                def pathName = it.source.getAsPath()
+                def compileSource = it.source
                 def name = it.getDestinationDir().name
                 def compileClasspath = it.classpath
                 final spoonExt = project.spoon.lazyExtensions == null ? project.spoon : project.spoon.lazyExtensions.get()
                 if (!spoonExt.exclude.contains(name) && !it.source.empty) {
                     def spoonTask = project.task("spoon${name}".toLowerCase(), type: SpoonTask) {
                         buildOnlyOutdatedFiles = spoonExt.buildOnlyOutdatedFiles
-                        srcFolders += pathName
+                        srcFolder = compileSource
                         outFolder = project.file("${project.buildDir}/generated-sources/spoon/${name}")
                         processors = spoonExt.processors
                         classpath = compileClasspath.filter {f -> f.exists()}
