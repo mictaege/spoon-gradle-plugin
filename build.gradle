@@ -1,5 +1,5 @@
 group 'com.github.mictaege'
-version '1.4'
+version '1.5'
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
@@ -19,7 +19,10 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
-    compile('fr.inria.gforge.spoon:spoon-core:5.8.0') {
+    compile 'com.google.guava:guava:23.0'
+    compile 'com.github.javaparser:javaparser-core:3.5.4'
+    compile 'com.github.javaparser:java-symbol-solver-core:0.6.2'
+    compile('fr.inria.gforge.spoon:spoon-core:6.0.0') {
         exclude group: "org.eclipse.tycho", module : "org.eclipse.jdt.core"
     }
 }

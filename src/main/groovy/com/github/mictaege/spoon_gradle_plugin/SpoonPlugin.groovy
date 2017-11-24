@@ -17,21 +17,33 @@ class SpoonPlugin implements Plugin<Project> {
         project.afterEvaluate({
 
             project.tasks.withType(JavaCompile) {
-                def compileSource = it.source
+                def spoonExt = project.spoon.lazyExtensions == null ? project.spoon : project.spoon.lazyExtensions.get()
                 def name = it.getDestinationDir().name
-                def compileClasspath = it.classpath
-                final spoonExt = project.spoon.lazyExtensions == null ? project.spoon : project.spoon.lazyExtensions.get()
+                def compileSrcDir = project.file("${project.projectDir.absolutePath}/src/$name/java/")
+                def spoonOutDir = project.file("${project.buildDir}/generated-sources/spoon/${name}")
+                def compileClasspath = it.classpath.filter {f -> f.exists()}
                 if (!spoonExt.exclude.contains(name) && !it.source.empty) {
-                    def spoonTask = project.task("spoon${name}".toLowerCase(), type: SpoonTask) {
-                        buildOnlyOutdatedFiles = spoonExt.buildOnlyOutdatedFiles
-                        srcFolder = compileSource
-                        outFolder = project.file("${project.buildDir}/generated-sources/spoon/${name}")
+
+                    def spoonCopyTask = project.task("spoonCopy${name.capitalize()}", type: SpoonCopyTask) {
+                        srcDir = compileSrcDir
+                        outDir = spoonOutDir
+                        fileFilter = spoonExt.fileFilter
+                    }
+
+                    def spoonTask = project.task("spoon${name.capitalize()}", type: SpoonTask) {
+                        srcDir = compileSrcDir
+                        outDir = spoonOutDir
+                        fileFilter = spoonExt.fileFilter
                         processors = spoonExt.processors
-                        classpath = compileClasspath.filter {f -> f.exists()}
+                        classpath = compileClasspath
                         compliance = spoonExt.compliance
                     }
-                    it.source = spoonTask.outFolder
+
+                    spoonTask.dependsOn spoonCopyTask
+
+                    it.source = spoonOutDir
                     it.dependsOn spoonTask
+
                 }
             }
         })
