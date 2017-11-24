@@ -1,9 +1,8 @@
 package com.github.mictaege.spoon_gradle_plugin
 
-class SpoonExtension {
+import java.util.function.Function
 
-    /** Set Spoon to build only the source files that have been modified since the latest source code generation, for performance purpose. (default: true) */
-    boolean buildOnlyOutdatedFiles = true
+class SpoonExtension {
 
     /** List of processor's qualified name to be used. */
     String[] processors = []
@@ -16,5 +15,13 @@ class SpoonExtension {
 
     /** Java source code compliance level (1,2,3,4,5, 6, 7 or 8). (default: 8) */
     int compliance = 8
+
+    /**
+     * A filter closure to specify which source files should be spooned. (default: all source files)
+     *
+     *  Example:
+     *  <pre>fileFilter = { File src -> src.text.contains("org.junit.Test") }</pre>
+     */
+    Function<File, Boolean> fileFilter = { File src -> true }
 
 }
