@@ -6,12 +6,11 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 
 import java.util.function.Function
 
 class SpoonCopyTask extends DefaultTask {
-
-    private Logger log = Logging.getLogger("spoon")
 
     @InputFiles
     File srcDir
@@ -22,14 +21,18 @@ class SpoonCopyTask extends DefaultTask {
 
     @TaskAction
     void run() {
-        project.copy {
-            from (srcDir.path) {
-                include '**/*.java'
-                exclude {f ->
-                    !f.isDirectory() && fileFilter.apply(f.file)
+        try {
+            project.copy {
+                from (srcDir.path) {
+                    include '**/*.java'
+                    exclude {f ->
+                        !f.isDirectory() && fileFilter.apply(f.file)
+                    }
                 }
+                into outDir.path
             }
-            into outDir.path
+        } catch (final Exception e) {
+            throw new TaskExecutionException(this, e)
         }
     }
 

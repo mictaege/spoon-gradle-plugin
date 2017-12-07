@@ -12,6 +12,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 import spoon.Launcher
 
 import java.util.function.Function
@@ -33,31 +34,34 @@ class SpoonTask extends DefaultTask {
 
     @TaskAction
     void run() {
+        try {
+            List<String> params = new LinkedList<>()
 
-        List<String> params = new LinkedList<>()
+            addParam(params, '--input', srcDir.getAbsolutePath())
+            addParam(params, '--output', outDir.getAbsolutePath())
+            addParam(params, '--compliance', '' + compliance)
+            if (processors.size() != 0) {
+                addParam(params, '--processors', processors.join(pathSeparator))
+            }
+            if (!classpath.asPath.empty) {
+                addParam(params, '--source-classpath', classpath.asPath)
+            }
+            addKey(params, '--noclasspath')
+            addParam(params, '--level', "OFF")
+            addParam(params, '--output-type', "classes")
+            addKey(params, '--lines')
+            addKey(params, '--disable-model-self-checks')
 
-        addParam(params, '--input', srcDir.getAbsolutePath())
-        addParam(params, '--output', outDir.getAbsolutePath())
-        addParam(params, '--compliance', '' + compliance)
-        if (processors.size() != 0) {
-            addParam(params, '--processors', processors.join(pathSeparator))
+            addParam(params, '--generate-files', findTypesToSpoon())
+
+            def launcher = new Launcher()
+            String[] args = params.toArray(new String[params.size()])
+            logEnv(args)
+            launcher.setArgs(args)
+            launcher.run()
+        } catch (final Exception e) {
+            throw new TaskExecutionException(this, e)
         }
-        if (!classpath.asPath.empty) {
-            addParam(params, '--source-classpath', classpath.asPath)
-        }
-        addKey(params, '--noclasspath')
-        addParam(params, '--level', "OFF")
-        addParam(params, '--output-type', "classes")
-        addKey(params, '--lines')
-        addKey(params, '--disable-model-self-checks')
-
-        addParam(params, '--generate-files', findTypesToSpoon())
-
-        def launcher = new Launcher()
-        String[] args = params.toArray(new String[params.size()])
-        logEnv(args)
-        launcher.setArgs(args)
-        launcher.run()
     }
 
     private logEnv(String[] args) {
