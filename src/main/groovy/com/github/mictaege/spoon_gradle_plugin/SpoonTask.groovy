@@ -74,6 +74,7 @@ class SpoonTask extends DefaultTask {
         addParam(params, '--output-type', "classes")
         addKey(params, '--lines')
         addKey(params, '--disable-model-self-checks')
+        addKey(params, '--disable-comments')
 
         addParam(params, '--generate-files', findTypesToSpoon())
 
