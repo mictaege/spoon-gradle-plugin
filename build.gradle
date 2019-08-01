@@ -22,7 +22,7 @@ dependencies {
     compile 'com.google.guava:guava:23.0'
     compile 'com.github.javaparser:javaparser-core:3.5.4'
     compile 'com.github.javaparser:java-symbol-solver-core:0.6.2'
-    compile('fr.inria.gforge.spoon:spoon-core:7.0.0') {
+    compile('fr.inria.gforge.spoon:spoon-core:7.5.0') {
         exclude group: "org.eclipse.jdt", module : "org.eclipse.jdt.core"
     }
 }

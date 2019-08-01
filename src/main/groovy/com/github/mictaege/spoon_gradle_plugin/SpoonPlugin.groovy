@@ -3,8 +3,6 @@ package com.github.mictaege.spoon_gradle_plugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.compile.JavaCompile
 
 class SpoonPlugin implements Plugin<Project> {
@@ -25,7 +23,7 @@ class SpoonPlugin implements Plugin<Project> {
                 def javaTaskOutDir = it.getDestinationDir()
                 def compileSrcDir = project.file("${project.projectDir.absolutePath}/src/$name/java/")
                 def spoonOutDir = project.file("${project.buildDir}/generated-sources/spoon/${name}")
-                def compileClasspath = it.classpath.filter {f -> f.exists()}
+                def compileClasspath = it.classpath
                 if (!spoonExt.exclude.contains(name) && !it.source.empty) {
 
                     def spoonTask = project.task("spoon${name.capitalize()}", type: SpoonTask) {
