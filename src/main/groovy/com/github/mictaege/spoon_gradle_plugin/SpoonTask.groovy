@@ -9,13 +9,10 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskExecutionException
-import org.gradle.api.tasks.WorkResult
+import org.gradle.api.tasks.*
 import spoon.Launcher
 
+import java.lang.reflect.Method
 import java.util.function.Function
 
 import static java.io.File.pathSeparator
@@ -66,10 +63,7 @@ class SpoonTask extends DefaultTask {
         if (processors.size() != 0) {
             addParam(params, '--processors', processors.join(pathSeparator))
         }
-        if (!classpath.asPath.empty) {
-            addParam(params, '--source-classpath', classpath.asPath)
-        }
-        addKey(params, '--noclasspath')
+        addParam(params, '--cpmode', 'noclasspath')
         addParam(params, '--level', "OFF")
         addParam(params, '--output-type', "classes")
         addKey(params, '--lines')
@@ -82,7 +76,25 @@ class SpoonTask extends DefaultTask {
         String[] args = params.toArray(new String[params.size()])
         logEnv(args)
         launcher.setArgs(args)
+        launcher.environment.setInputClassLoader(extendedClassloader())
         launcher.run()
+    }
+
+    private ClassLoader extendedClassloader() {
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()
+        Class sysclass = URLClassLoader.class
+        classpath.forEach { f ->
+            if (f.exists()) {
+                try {
+                    Method method = sysclass.getDeclaredMethod("addURL", URL.class)
+                    method.setAccessible(true)
+                    method.invoke(sysloader, f.toURI().toURL())
+                } catch (Throwable t) {
+                    throw new IOException("Error, could not add URL to system classloader", t)
+                }
+            }
+        }
+        return sysloader
     }
 
     private logEnv(String[] args) {
