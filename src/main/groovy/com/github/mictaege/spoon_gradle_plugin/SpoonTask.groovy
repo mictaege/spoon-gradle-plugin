@@ -24,7 +24,7 @@ import spoon.Launcher
 import java.lang.reflect.Method
 import java.util.function.Function
 
-import static java.io.File.pathSeparator 
+import static java.io.File.pathSeparator
 
 abstract class SpoonTask extends DefaultTask {
 
@@ -43,7 +43,7 @@ abstract class SpoonTask extends DefaultTask {
 	FileCollection classpath
 	@Input
 	int compliance
-	
+
 	int unspoonedFilesCopied
 	int unspoonedFilesTargetDeleted
 	int spoonedFilesTargetDeleted
@@ -52,6 +52,10 @@ abstract class SpoonTask extends DefaultTask {
 	@TaskAction
 	void run(InputChanges inputChanges) {
 		try {
+			if (!inputChanges.incremental) {
+				outDir.deleteDir() //remove all files in order to avoid orphan files from moved/deleted sources
+			}
+
 			prepareSpoon(inputChanges)
 			runSpoon(inputChanges)
 			println("""SpoonTask Statistics:
@@ -68,9 +72,22 @@ abstract class SpoonTask extends DefaultTask {
 
 	private void prepareSpoon(InputChanges inputChanges) {
 		//copy all "unspooned" files into outDir
+		//TODO measure performance in comparison to older implementation - use old impl if !inputChanges.incremental?
+		//old impl:
+		//
+		//project.copy {
+		//            from(srcDir.path) {
+		//                include '**/*.java'
+		//                exclude { f ->
+		//                    !f.isDirectory() && fileFilter.apply(f.file)
+		//                }
+		//            }
+		//            into outDir.path
+		//        }
+		//
 		inputChanges.getFileChanges(getSrcDir()).each { change ->
 			def file = change.file
-			
+
 			if (change.fileType == FileType.DIRECTORY) {
 				return
 			}
@@ -90,7 +107,6 @@ abstract class SpoonTask extends DefaultTask {
 				}
 			}
 		}
-		
 	}
 
 	private void runSpoon(InputChanges inputChanges) {
@@ -185,4 +201,12 @@ abstract class SpoonTask extends DefaultTask {
 		}
 		return typeList.join(":")
 	}
+
+//	public void debugChange(FileChange change) {
+//		log.debug("""change: 
+//File:       ${change.file}
+//FileType:   ${change.fileType}
+//ChangeType: ${change.changeType}
+//""")
+//	}
 }
