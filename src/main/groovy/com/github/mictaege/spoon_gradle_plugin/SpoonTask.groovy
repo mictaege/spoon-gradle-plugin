@@ -21,7 +21,6 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import spoon.Launcher
 
-import java.lang.reflect.Method
 import java.util.function.Function
 
 import static java.io.File.pathSeparator
@@ -137,20 +136,29 @@ abstract class SpoonTask extends DefaultTask {
 	}
 
 	private ClassLoader extendedClassloader() {
-		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()
-		Class sysclass = URLClassLoader.class
-		classpath.forEach { f ->
-			if (f.exists()) {
-				try {
-					Method method = sysclass.getDeclaredMethod("addURL", URL.class)
-					method.setAccessible(true)
-					method.invoke(sysloader, f.toURI().toURL())
-				} catch (Throwable t) {
-					throw new IOException("Error, could not add URL to system classloader", t)
-				}
-			}
+		ArrayList urls = new ArrayList()
+		classpath.forEach { File file ->
+			if (file.exists())
+				urls += file.toURI().toURL()
 		}
-		return sysloader
+		return new URLClassLoader(urls.toArray(new URL[0]));
+//do NOT put the whole system classloader into the spoon call
+//		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()
+//		Class sysclass = URLClassLoader.class
+//		println("here's the classpath")
+//		classpath.forEach { f ->
+//			println(f.absolutePath)
+//			if (f.exists()) {
+//				try {
+//					Method method = sysclass.getDeclaredMethod("addURL", URL.class)
+//					method.setAccessible(true)
+//					method.invoke(sysloader, f.toURI().toURL())
+//				} catch (Throwable t) {
+//					throw new IOException("Error, could not add URL to system classloader", t)
+//				}
+//			}
+//		}
+//		return sysloader
 	}
 
 	private logEnv(String[] args) {
