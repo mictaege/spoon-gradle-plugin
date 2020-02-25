@@ -71,19 +71,6 @@ abstract class SpoonTask extends DefaultTask {
 
 	private void prepareSpoon(InputChanges inputChanges) {
 		//copy all "unspooned" files into outDir
-		//TODO measure performance in comparison to older implementation - use old impl if !inputChanges.incremental?
-		//old impl:
-		//
-		//project.copy {
-		//            from(srcDir.path) {
-		//                include '**/*.java'
-		//                exclude { f ->
-		//                    !f.isDirectory() && fileFilter.apply(f.file)
-		//                }
-		//            }
-		//            into outDir.path
-		//        }
-		//
 		inputChanges.getFileChanges(getSrcDir()).each { change ->
 			def file = change.file
 
@@ -142,23 +129,6 @@ abstract class SpoonTask extends DefaultTask {
 				urls += file.toURI().toURL()
 		}
 		return new URLClassLoader(urls.toArray(new URL[0]));
-//do NOT put the whole system classloader into the spoon call
-//		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()
-//		Class sysclass = URLClassLoader.class
-//		println("here's the classpath")
-//		classpath.forEach { f ->
-//			println(f.absolutePath)
-//			if (f.exists()) {
-//				try {
-//					Method method = sysclass.getDeclaredMethod("addURL", URL.class)
-//					method.setAccessible(true)
-//					method.invoke(sysloader, f.toURI().toURL())
-//				} catch (Throwable t) {
-//					throw new IOException("Error, could not add URL to system classloader", t)
-//				}
-//			}
-//		}
-//		return sysloader
 	}
 
 	private logEnv(String[] args) {
@@ -209,12 +179,4 @@ abstract class SpoonTask extends DefaultTask {
 		}
 		return typeList.join(":")
 	}
-
-//	public void debugChange(FileChange change) {
-//		log.debug("""change: 
-//File:       ${change.file}
-//FileType:   ${change.fileType}
-//ChangeType: ${change.changeType}
-//""")
-//	}
 }
