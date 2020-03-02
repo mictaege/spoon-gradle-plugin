@@ -1,5 +1,5 @@
 group 'com.github.mictaege'
-version '2019.1'
+version '2020.1'
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
@@ -7,8 +7,9 @@ apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.3.1'
+wrapper {
+	gradleVersion = "5.4.1"
+	distributionType = Wrapper.DistributionType.ALL
 }
 
 repositories {
@@ -18,7 +19,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.codehaus.groovy:groovy-all:2.4.12'
+    compile 'org.codehaus.groovy:groovy-all:2.5.8'
     compile 'com.google.guava:guava:23.0'
     compile 'com.github.javaparser:javaparser-core:3.5.4'
     compile 'com.github.javaparser:java-symbol-solver-core:0.6.2'
