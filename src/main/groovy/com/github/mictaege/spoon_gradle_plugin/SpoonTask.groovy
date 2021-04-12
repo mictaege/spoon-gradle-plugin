@@ -8,26 +8,19 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.api.tasks.*
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import spoon.Launcher
 
+import java.lang.reflect.Method
 import java.util.function.Function
 
-import static java.io.File.pathSeparator
+import static spoon.OutputType.CLASSES
+import static spoon.reflect.visitor.PrettyPrinterCreator.createPrettyPrinter
 
 abstract class SpoonTask extends DefaultTask {
-
-	private Logger log = Logging.getLogger("spoon")
 
 	@Incremental
 	@InputDirectory
@@ -96,60 +89,47 @@ abstract class SpoonTask extends DefaultTask {
 	}
 
 	private void runSpoon(InputChanges inputChanges) {
-		List<String> params = new LinkedList<>()
-
-		addParam(params, '--input', getSrcDir().get().asFile.absolutePath)
-		addParam(params, '--output', outDir.absolutePath)
-		addParam(params, '--compliance', '' + compliance)
-		if (processors.size() != 0) {
-			addParam(params, '--processors', processors.join(pathSeparator))
-		}
-		addParam(params, '--cpmode', 'noclasspath')
-		addParam(params, '--level', "OFF")
-		addParam(params, '--output-type', "classes")
-		addKey(params, '--lines')
-		addKey(params, '--disable-model-self-checks')
-		addKey(params, '--disable-comments')
-
-		def typesToSpoon = findTypesToSpoon(inputChanges)
-		addParam(params, '--generate-files', typesToSpoon)
-
 		def launcher = new Launcher()
-		String[] args = params.toArray(new String[params.size()])
-		logEnv(args)
-		launcher.setArgs(args)
+		launcher.modelBuilder.addInputSource(getSrcDir().get().asFile)
+		launcher.environment.setSourceOutputDirectory(outDir)
+		launcher.setOutputFilter(findTypesToSpoon(inputChanges))
 		launcher.environment.setInputClassLoader(extendedClassloader())
+		launcher.environment.setComplianceLevel(compliance)
+		launcher.environment.setNoClasspath(true)
+		launcher.environment.setLevel("OFF")
+		launcher.environment.setOutputType(CLASSES)
+		launcher.environment.setPreserveLineNumbers(true)
+		launcher.environment.setCommentEnabled(false)
+		launcher.environment.disableConsistencyChecks()
+		launcher.environment.setShouldCompile(false)
+		processors.each { String procType ->
+			launcher.addProcessor(procType)
+		}
+		launcher.environment.setPrettyPrinterCreator {
+			createPrettyPrinter(launcher.environment)
+		}
 		launcher.run()
 	}
 
 	private ClassLoader extendedClassloader() {
-		ArrayList urls = new ArrayList()
-		classpath.forEach { File file ->
-			if (file.exists())
-				urls += file.toURI().toURL()
+		URLClassLoader sysloader = (URLClassLoader) getClass().getClassLoader()
+		Class sysclass = URLClassLoader.class
+		Method method = sysclass.getDeclaredMethod("addURL", URL.class)
+		method.setAccessible(true)
+		classpath.forEach { f ->
+			if (f.exists()) {
+				try {
+					method.invoke(sysloader, f.toURI().toURL())
+				} catch (Throwable t) {
+					throw new IOException("Error, could not add URL to system classloader", t)
+				}
+			}
 		}
-		return new URLClassLoader(urls.toArray(new URL[0]));
+		return sysloader
 	}
 
-	private logEnv(String[] args) {
-		log.debug "Spoon arguments:"
-		for (final String arg : args) {
-			log.debug "\t$arg"
-		}
-	}
-
-	private static void addParam(params, key, value) {
-		addKey(params, key)
-		params.add(value)
-	}
-
-	private static void addKey(params, key) {
-		params.add(key)
-	}
-
-	private String findTypesToSpoon(InputChanges inputChanges) {
+	private String[] findTypesToSpoon(InputChanges inputChanges) {
 		List<String> typeList = new ArrayList<>()
-
 		inputChanges.getFileChanges(getSrcDir()).each { change ->
 			def file = change.file
 			if (change.fileType == FileType.DIRECTORY) {
@@ -177,6 +157,6 @@ abstract class SpoonTask extends DefaultTask {
 				}
 			}
 		}
-		return typeList.join(":")
+		return typeList.toArray(new String[typeList.size()])
 	}
 }
