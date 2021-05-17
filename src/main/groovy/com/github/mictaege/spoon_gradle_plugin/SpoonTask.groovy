@@ -28,6 +28,7 @@ abstract class SpoonTask extends DefaultTask {
 	@OutputDirectory
 	File outDir
 	// should be an @Input, but needs to be serializable
+	@Internal
 	Function<File, Boolean> fileFilter
 	@Input
 	String[] processors = []
@@ -36,9 +37,13 @@ abstract class SpoonTask extends DefaultTask {
 	@Input
 	int compliance
 
+	@Internal
 	int unspoonedFilesCopied
+	@Internal
 	int unspoonedFilesTargetDeleted
+	@Internal
 	int spoonedFilesTargetDeleted
+	@Internal
 	int spoonedFilesSentToSpoon
 
 	@TaskAction
