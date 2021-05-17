@@ -28,6 +28,7 @@ abstract class SpoonTask extends DefaultTask {
 	@OutputDirectory
 	File outDir
 	// should be an @Input, but needs to be serializable
+	@Internal
 	Function<File, Boolean> fileFilter
 	@Input
 	String[] processors = []
@@ -36,9 +37,13 @@ abstract class SpoonTask extends DefaultTask {
 	@Input
 	int compliance
 
+	@Internal
 	int unspoonedFilesCopied
+	@Internal
 	int unspoonedFilesTargetDeleted
+	@Internal
 	int spoonedFilesTargetDeleted
+	@Internal
 	int spoonedFilesSentToSpoon
 
 	@TaskAction
@@ -148,11 +153,14 @@ abstract class SpoonTask extends DefaultTask {
 			} else {
 				def solver = new JavaParserTypeSolver(srcDirFile)
 				if (!file.isDirectory()) {
-					JavaParser.parse(file)
-							.findAll(TypeDeclaration.class)
-							.forEach { n ->
-								typeList.add(JavaParserFacade.get(solver).getTypeDeclaration(n).getQualifiedName())
-							}
+					def parser = new JavaParser()
+					parser.parse(file)
+							.ifSuccessful({
+								it.findAll(TypeDeclaration.class)
+										.forEach { n ->
+											typeList.add(JavaParserFacade.get(solver).getTypeDeclaration(n).getQualifiedName())
+										}
+							})
 					spoonedFilesSentToSpoon++
 				}
 			}
