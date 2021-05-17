@@ -148,11 +148,14 @@ abstract class SpoonTask extends DefaultTask {
 			} else {
 				def solver = new JavaParserTypeSolver(srcDirFile)
 				if (!file.isDirectory()) {
-					JavaParser.parse(file)
-							.findAll(TypeDeclaration.class)
-							.forEach { n ->
-								typeList.add(JavaParserFacade.get(solver).getTypeDeclaration(n).getQualifiedName())
-							}
+					def parser = new JavaParser()
+					parser.parse(file)
+							.ifSuccessful({
+								it.findAll(TypeDeclaration.class)
+										.forEach { n ->
+											typeList.add(JavaParserFacade.get(solver).getTypeDeclaration(n).getQualifiedName())
+										}
+							})
 					spoonedFilesSentToSpoon++
 				}
 			}
