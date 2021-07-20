@@ -122,9 +122,10 @@ abstract class SpoonTask extends DefaultTask {
 		Method method = sysclass.getDeclaredMethod("addURL", URL.class)
 		method.setAccessible(true)
 		classpath.forEach { f ->
-			if (f.exists()) {
+			def cpUrl = f.toURI().toURL()
+			if ("file".equals(cpUrl.getProtocol()) && new File(cpUrl.getPath()).exists()) {
 				try {
-					method.invoke(sysloader, f.toURI().toURL())
+					method.invoke(sysloader, cpUrl)
 				} catch (Throwable t) {
 					throw new IOException("Error, could not add URL to system classloader", t)
 				}
