@@ -14,7 +14,6 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import spoon.Launcher
 
-import java.lang.reflect.Method
 import java.util.function.Function
 
 import static spoon.OutputType.CLASSES
@@ -117,21 +116,13 @@ abstract class SpoonTask extends DefaultTask {
 	}
 
 	private ClassLoader extendedClassloader() {
-		URLClassLoader sysloader = (URLClassLoader) getClass().getClassLoader()
-		Class sysclass = URLClassLoader.class
-		Method method = sysclass.getDeclaredMethod("addURL", URL.class)
-		method.setAccessible(true)
+		List<URL> cpUrls = new ArrayList<>()
 		classpath.forEach { f ->
-			def cpUrl = f.toURI().toURL()
-			if ("file".equals(cpUrl.getProtocol()) && new File(cpUrl.getPath()).exists()) {
-				try {
-					method.invoke(sysloader, cpUrl)
-				} catch (Throwable t) {
-					throw new IOException("Error, could not add URL to system classloader", t)
-				}
+			if (f.exists()) {
+				cpUrls.add(f.toURI().toURL())
 			}
 		}
-		return sysloader
+		return URLClassLoader.newInstance(cpUrls.toArray(new URL[cpUrls.size()]), getClass().getClassLoader())
 	}
 
 	private String[] findTypesToSpoon(InputChanges inputChanges) {
