@@ -44,7 +44,7 @@ sourceSets {
 
 Add a _buildscript_ section to your _build.gradle_ file and define the required classpath dependencies to the _spoon-gradle-plugin_ and to _org.eclipse.jdt.core_.
 
-**Note** that the _spoon-gradle-plugin_ currently supports [Spoon](http://spoon.gforge.inria.fr/index.html) version _9.0.0_, which requires _org.eclipse.jdt.core_ version _3.25.0_.
+**Note** that the _spoon-gradle-plugin_ currently supports [Spoon](http://spoon.gforge.inria.fr/index.html) version _10.3.0_, which requires _org.eclipse.jdt.core_ version _3.34.0_.
 
 ```Groovy
 buildscript {
@@ -53,7 +53,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
-        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.25.0'
+        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.33.0'
     }
 }
 ```
@@ -75,7 +75,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
-        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.25.0'
+        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.33.0'
         classpath group: 'mygroup', name: 'my-processors', version: '1.0'
     }
 }
@@ -145,7 +145,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
-        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.25.0'
+        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.34.0'
         classpath group: 'xxx.xxxx.xxxx', name: 'xxx-processors', version: 'x.x'
     }
 }
