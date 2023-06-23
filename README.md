@@ -44,7 +44,7 @@ sourceSets {
 
 Add a _buildscript_ section to your _build.gradle_ file and define the required classpath dependencies to the _spoon-gradle-plugin_ and to _org.eclipse.jdt.core_.
 
-**Note** that the _spoon-gradle-plugin_ currently supports [Spoon](http://spoon.gforge.inria.fr/index.html) version _10.3.0_, which requires _org.eclipse.jdt.core_ version _3.34.0_.
+**Note** that the _spoon-gradle-plugin_ currently supports [Spoon](http://spoon.gforge.inria.fr/index.html) version _10.1.0_, which requires _org.eclipse.jdt.core_ version _3.34.0_.
 
 ```Groovy
 buildscript {
