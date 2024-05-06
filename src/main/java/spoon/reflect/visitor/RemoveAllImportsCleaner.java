@@ -6,8 +6,13 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.path.CtRole;
 import spoon.reflect.reference.CtTypeReference;
 
-
+/** Cleans all imports */
 public class RemoveAllImportsCleaner extends ImportAnalyzer<RemoveAllImportsCleaner.Context> {
+
+    /** Default */
+    public RemoveAllImportsCleaner() {
+        super();
+    }
 
     @Override
     protected ImportCleanerScanner createScanner() {
