@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.mictaege"
-version = "2024.1"
+version = "2024.2-rc2"
 
 gradlePlugin {
     website.set("https://github.com/mictaege/spoon-gradle-plugin")
@@ -34,7 +34,6 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
-    //implementation("org.codehaus.groovy:groovy-all:3.0.17")
     implementation("com.google.guava:guava:33.2.0-jre")
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.25.10")
     api("fr.inria.gforge.spoon:spoon-core:11.0.0"){
