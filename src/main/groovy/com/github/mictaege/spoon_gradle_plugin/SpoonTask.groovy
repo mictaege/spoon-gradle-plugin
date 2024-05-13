@@ -1,6 +1,7 @@
 package com.github.mictaege.spoon_gradle_plugin
 
 import com.github.javaparser.JavaParser
+import com.github.javaparser.ParserConfiguration
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
@@ -146,6 +147,7 @@ abstract class SpoonTask extends DefaultTask {
 				def solver = new JavaParserTypeSolver(srcDirFile)
 				if (!file.isDirectory()) {
 					def parser = new JavaParser()
+					parser.parserConfiguration.setLanguageLevel(ParserConfiguration.LanguageLevel.BLEEDING_EDGE)
 					parser.parse(file)
 							.ifSuccessful({
 								it.findAll(TypeDeclaration.class)

@@ -1,6 +1,6 @@
 # spoon-gradle-plugin
 
-[![Apache License 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Maven Central](https://img.shields.io/maven-central/v/com.github.mictaege/spoon-gradle-plugin.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.mictaege%22%20AND%20a%3A%22spoon-gradle-plugin%22)
+[![Apache License 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Maven Central](https://img.shields.io/maven-central/v/io.github.mictaege/spoon-gradle-plugin.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.github.mictaege%22%20AND%20a%3A%22spoon-gradle-plugin%22)
 
 This repository contains a gradle plugin for the Java analysis and transformation framework [Spoon](http://spoon.gforge.inria.fr/index.html).
 
@@ -44,7 +44,7 @@ sourceSets {
 
 Add a _buildscript_ section to your _build.gradle_ file and define the required classpath dependencies to the _spoon-gradle-plugin_ and to _org.eclipse.jdt.core_.
 
-**Note** that the _spoon-gradle-plugin_ currently supports [Spoon](http://spoon.gforge.inria.fr/index.html) version _10.1.0_, which requires _org.eclipse.jdt.core_ version _3.34.0_.
+**Note** that the _spoon-gradle-plugin_ currently supports [Spoon](http://spoon.gforge.inria.fr/index.html) version _11.0.0_, which requires _org.eclipse.jdt.core_ version _3.37.0_.
 
 ```Groovy
 buildscript {
@@ -52,8 +52,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'com.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
-        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.33.0'
+        classpath group: 'io.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
+        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.37.0'
     }
 }
 ```
@@ -74,8 +74,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'com.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
-        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.33.0'
+        classpath group: 'io.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
+        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.37.0'
         classpath group: 'mygroup', name: 'my-processors', version: '1.0'
     }
 }
@@ -85,7 +85,7 @@ Then you have to configure the processors with the fully qualified name
 
 ```Groovy
 spoon{
-    processors = ['com.github.mictaege.spoon_processors.CheckNotNullProcessor']
+    processors = ['io.github.mictaege.spoon_processors.CheckNotNullProcessor']
 }
 ```
 
@@ -114,14 +114,14 @@ build
 ## Further settings
 
 Within the _spoon_ section you can also set the following flags 
-- _compliance_: Java source code compliance level (1,2,3,4,5, 6, 7 or 8). (default: 8)
+- _compliance_: Java source code compliance level (1,2,3,4,5, 6, 7, 8, 11 ...). (default: 11)
 - _exclude_: Exclude Java source sets from spoon processing. (default: none)
 - _fileFilter_: A filter closure to specify which source files should be spooned. (default: all source files)
 
 ```Groovy
 spoon{
-    processors = ['com.github.mictaege.spoon_processors.CheckNotNullProcessor']
-    compliance 7
+    processors = ['io.github.mictaege.spoon_processors.CheckNotNullProcessor']
+    compliance 17
     exclude = ['main', 'test']
     fileFilter = { File src -> src.text.contains("@NotNull") }
 }
@@ -144,8 +144,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'com.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
-        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.34.0'
+        classpath group: 'io.github.mictaege', name: 'spoon-gradle-plugin', version:'x.x'
+        classpath group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.37.0'
         classpath group: 'xxx.xxxx.xxxx', name: 'xxx-processors', version: 'x.x'
     }
 }
