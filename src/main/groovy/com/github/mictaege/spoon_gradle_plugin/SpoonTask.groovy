@@ -1,7 +1,9 @@
 package com.github.mictaege.spoon_gradle_plugin
 
 import com.github.javaparser.JavaParser
+import com.github.javaparser.ParseResult
 import com.github.javaparser.ParserConfiguration
+import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
@@ -147,9 +149,18 @@ abstract class SpoonTask extends DefaultTask {
 				def solver = new JavaParserTypeSolver(srcDirFile)
 				if (!file.isDirectory()) {
 					def parser = new JavaParser()
-					parser.parserConfiguration.setLanguageLevel(ParserConfiguration.LanguageLevel.BLEEDING_EDGE)
-					parser.parse(file)
-							.ifSuccessful({
+					parser.parserConfiguration.setLanguageLevel(ParserConfiguration.LanguageLevel.RAW)
+
+					def result = parser.parse(file)
+					if (!result.isSuccessful()) {
+						println("Parsing Java file ${file.toPath()} failed!")
+						println("Since we are unable to find it's types to spoon, they may be missing in the output.")
+						println("Problems:")
+						result.problems.forEach {
+							println(it.verboseMessage)
+						}
+					}
+					result.ifSuccessful({
 								it.findAll(TypeDeclaration.class)
 										.forEach { n ->
 											typeList.add(JavaParserFacade.get(solver).getTypeDeclaration(n).getQualifiedName())

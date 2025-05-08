@@ -35,7 +35,7 @@ repositories {
 dependencies {
     implementation(gradleApi())
     implementation("com.google.guava:guava:33.4.8-jre")
-    implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.0")
+    implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
     api("fr.inria.gforge.spoon:spoon-core:11.2.0"){
         exclude(group = "org.eclipse.jdt", module = "org.eclipse.jdt.core")
     }
