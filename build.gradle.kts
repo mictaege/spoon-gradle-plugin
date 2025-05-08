@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.mictaege"
-version = "2024.3"
+version = "2025.1"
 
 gradlePlugin {
     website.set("https://github.com/mictaege/spoon-gradle-plugin")
