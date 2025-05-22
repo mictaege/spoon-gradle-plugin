@@ -1,13 +1,17 @@
+import org.jreleaser.model.Active
+import org.jreleaser.model.Signing
+
 plugins {
     groovy
     `java-gradle-plugin`
     `maven-publish`
     id("com.gradle.plugin-publish") version "1.2.1"
     signing
+    id("org.jreleaser") version "1.18.0"
 }
 
 group = "io.github.mictaege"
-version = "2025.2"
+version = "2025.3-rc1"
 
 gradlePlugin {
     website.set("https://github.com/mictaege/spoon-gradle-plugin")
@@ -109,17 +113,41 @@ publishing {
     }
     repositories {
         maven {
-            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-            credentials {
-                username = if (hasProperty("ossrhUsername")) property("ossrhUsername") as String else ""
-                password = if (hasProperty("ossrhPassword")) property("ossrhPassword") as String else ""
-            }
+            url = uri(layout.buildDirectory.dir("staging-deploy").get().asFile.toURI())
         }
     }
 }
 
-signing {
-    sign(publishing.publications["mavenJava"])
+jreleaser {
+    project {
+        copyright.set("Michael Taege")
+        description.set("The spoon-gradle-plugin is a gradle plugin for the Java analysis and transformation framework Spoon.")
+    }
+    signing {
+        active.set(Active.ALWAYS)
+        armored.set(true)
+        checksums.set(true)
+        mode.set(Signing.Mode.FILE)
+        passphrase.set(if (hasProperty("centralPortalKeyPwd")) property("centralPortalKeyPwd") as String else "")
+        publicKey.set(if (hasProperty("centralPortalPublicKey")) property("centralPortalPublicKey") as String else "")
+        secretKey.set(if (hasProperty("centralPortalSecretKey")) property("centralPortalSecretKey") as String else "")
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active.set(Active.ALWAYS)
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    username.set(if (hasProperty("centralPortalUsr")) property("centralPortalUsr") as String else "")
+                    password.set(if (hasProperty("centralPortalPwd")) property("centralPortalPwd") as String else "")
+                    stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.path)
+                }
+            }
+        }
+    }
+    release {
+        github {
+            enabled.set(false)
+        }
+    }
 }
