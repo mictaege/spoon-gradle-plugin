@@ -113,7 +113,8 @@ publishing {
     }
     repositories {
         maven {
-            url = uri(layout.buildDirectory.dir("staging-deploy").get().asFile.toURI())
+            name = "staging"
+            url = uri(layout.buildDirectory.dir("staging").get().asFile.toURI())
         }
     }
 }
@@ -140,7 +141,7 @@ jreleaser {
                     url = "https://central.sonatype.com/api/v1/publisher"
                     username.set(if (hasProperty("centralPortalUsr")) property("centralPortalUsr") as String else "")
                     password.set(if (hasProperty("centralPortalPwd")) property("centralPortalPwd") as String else "")
-                    stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.path)
+                    stagingRepository(layout.buildDirectory.dir("staging").get().asFile.path)
                 }
             }
         }
