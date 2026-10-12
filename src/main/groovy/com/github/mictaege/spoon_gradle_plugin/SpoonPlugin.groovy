@@ -18,7 +18,7 @@ class SpoonPlugin implements Plugin<Project> {
 
             project.tasks.withType(JavaCompile) {
                 def spoonExt = project.spoon.lazyExtensions == null ? project.spoon : project.spoon.lazyExtensions.get()
-                def name = it.getDestinationDir().name
+                def name = it.destinationDirectory.get().asFile.name
                 def compileSrcDir = project.file("${project.projectDir.absolutePath}/src/$name/java/")
                 def spoonOutDir = project.file("${project.buildDir}/generated-sources/spoon/${name}")
                 def compileClasspath = it.classpath
