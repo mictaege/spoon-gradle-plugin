@@ -1,13 +1,12 @@
 package com.github.mictaege.spoon_gradle_plugin
 
 import com.github.javaparser.JavaParser
-import com.github.javaparser.ParseResult
 import com.github.javaparser.ParserConfiguration
-import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
@@ -22,19 +21,23 @@ import java.util.function.Function
 import static spoon.OutputType.CLASSES
 import static spoon.reflect.visitor.PrettyPrinterCreator.createPrettyPrinter
 
+@CacheableTask
 abstract class SpoonTask extends DefaultTask {
 
 	@Incremental
 	@InputDirectory
+	@PathSensitive(PathSensitivity.RELATIVE)
 	abstract DirectoryProperty getSrcDir()
 	@OutputDirectory
 	File outDir
-	// should be an @Input, but needs to be serializable
+	// should be an @Input, but needs to be serializable. It is code of the plugin which configures the task and as
+	// such part of the build script classpath: changing it changes the implementation of the task, which is an input.
 	@Internal
 	Function<File, Boolean> fileFilter
 	@Input
 	String[] processors = []
-	@InputFiles
+	// the processors see the classpath through a class loader only, e.g. to resolve constants used in annotations
+	@CompileClasspath
 	FileCollection classpath
 	@Input
 	int compliance
@@ -64,6 +67,8 @@ abstract class SpoonTask extends DefaultTask {
     spooned files:            $spoonedFilesSentToSpoon
     spooned source removed:   $spoonedFilesTargetDeleted (target files with spooning deleted)"""
 			)
+		} catch (final GradleException e) {
+			throw e
 		} catch (final Exception e) {
 			throw new TaskExecutionException(this, e)
 		}
@@ -81,8 +86,7 @@ abstract class SpoonTask extends DefaultTask {
 				return
 			}
 			if (change.file.name.endsWith(".java")) {
-				def srcDirAsFile = getSrcDir().get().asFile
-				def targetFile = new File(outDir.absolutePath + change.normalizedPath.substring(srcDirAsFile.absolutePath.length()))
+				def targetFile = targetFileOf(file)
 				if (change.changeType == ChangeType.REMOVED) {
 					targetFile.delete()
 					unspoonedFilesTargetDeleted++
@@ -93,6 +97,13 @@ abstract class SpoonTask extends DefaultTask {
 				}
 			}
 		}
+	}
+
+	// Not derived from the normalized path of the change: that one depends on the path sensitivity of srcDir.
+	// Not private: it is called from closures, which are unable to see private methods of the decorated task class.
+	protected File targetFileOf(File srcFile) {
+		def relativePath = getSrcDir().get().asFile.toPath().relativize(srcFile.toPath())
+		return outDir.toPath().resolve(relativePath).toFile()
 	}
 
 	private void runSpoon(InputChanges inputChanges) {
@@ -143,7 +154,7 @@ abstract class SpoonTask extends DefaultTask {
 			}
 			def srcDirFile = getSrcDir().get().asFile
 			if (change.changeType == ChangeType.REMOVED) {
-				new File(outDir.absolutePath + change.normalizedPath.substring(srcDirFile.absolutePath.length())).delete()
+				targetFileOf(file).delete()
 				spoonedFilesTargetDeleted++
 			} else {
 				def solver = new JavaParserTypeSolver(srcDirFile)
@@ -153,12 +164,10 @@ abstract class SpoonTask extends DefaultTask {
 
 					def result = parser.parse(file)
 					if (!result.isSuccessful()) {
-						println("Parsing Java file ${file.toPath()} failed!")
-						println("Since we are unable to find it's types to spoon, they may be missing in the output.")
-						println("Problems:")
-						result.problems.forEach {
-							println(it.verboseMessage)
-						}
+						// the types of the file are unknown, so they would be missing in the output (or a stale copy
+						// would be kept) - and the incomplete output would end up in the build cache
+						def problems = result.problems.collect { it.verboseMessage }.join(System.lineSeparator())
+						throw new GradleException("Parsing Java file ${file.toPath()} failed!${System.lineSeparator()}${problems}")
 					}
 					result.ifSuccessful({
 								it.findAll(TypeDeclaration.class)
