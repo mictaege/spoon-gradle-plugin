@@ -1,5 +1,8 @@
 # AGENTS.md — spoon-gradle-plugin
 
+> **End of life:** This repository is no longer maintained. Since jitter 2026.3 strips bytecode
+> instead of transforming sources with Spoon, `jitter-plugin` no longer depends on this plugin.
+
 ## Project purpose
 `spoon-gradle-plugin` is a Gradle plugin wrapping the Java analysis and transformation framework
 [Spoon](http://spoon.gforge.inria.fr/index.html). Unlike the official SpoonLabs Gradle plugin (which
@@ -7,9 +10,10 @@ only processes production sources and targets Android), this plugin processes **
 test** Java source sets and has no Android support — it's a general-purpose Spoon integration for
 plain Gradle Java projects.
 
-Part of the jitter/spoon family: it is a low-level building block consumed by
-[`jitter-plugin`](https://github.com/mictaege/jitter-plugin), which uses Spoon-based source
-transformation to implement application "flavours".
+Part of the jitter/spoon family: it was a low-level building block consumed by
+[`jitter-plugin`](https://github.com/mictaege/jitter-plugin), which used Spoon-based source
+transformation to implement application "flavours" (until jitter 2026.3 switched to bytecode
+stripping — see the EOL note above).
 
 ## Technical stack
 - Language: Kotlin (plugin sources under `src/main/kotlin`), implementation class

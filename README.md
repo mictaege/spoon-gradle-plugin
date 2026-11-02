@@ -1,5 +1,9 @@
 # spoon-gradle-plugin
 
+> **End of life:** This repository is no longer maintained and will not receive further updates.
+> Since [jitter](https://github.com/mictaege/jitter-plugin) 2026.3, application "flavours" are implemented by stripping bytecode instead of transforming sources with Spoon, so this plugin is no longer needed.
+> Use [jitter-plugin](https://github.com/mictaege/jitter-plugin) instead.
+
 [![Apache License 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Maven Central](https://img.shields.io/maven-central/v/io.github.mictaege/spoon-gradle-plugin.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.github.mictaege%22%20AND%20a%3A%22spoon-gradle-plugin%22)
 
 This repository contains a gradle plugin for the Java analysis and transformation framework [Spoon](http://spoon.gforge.inria.fr/index.html).
